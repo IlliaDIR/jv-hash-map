@@ -20,36 +20,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         this.threshold = (int) (capacity * LOAD_FACTOR);
     }
 
-    private int getIndex(int hash) {
-        return hash & (capacity - 1);
-    }
-
-    private int hash(K key) {
-        return (key == null) ? 0 : key.hashCode();
-    }
-
-    private Node<K,V>[] resize() {
-        capacity *= GROW_FACTOR;
-        Node<K,V>[] newTable = (Node<K,V>[]) new Node[capacity];
-        for (Node<K,V> node : table) {
-            Node<K,V> current = node;
-            while (current != null) {
-                Node<K,V> next = current.next;
-                int newIndex = getIndex(current.hash);
-                current.next = newTable[newIndex];
-                newTable[newIndex] = current;
-                current = next;
-            }
-        }
-        table = newTable;
-        threshold = calculateThreshold();
-        return table;
-    }
-
-    private int calculateThreshold() {
-        return (int) (capacity * LOAD_FACTOR);
-    }
-
     @Override
     public void put(K key, V value) {
         if (size > threshold) {
@@ -71,6 +41,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                     } else {
                         currentNode.next = new Node<>(hash(key), key, value);
                         size++;
+                        return;
                     }
                 }
             }
@@ -109,13 +80,43 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         return size;
     }
 
+    private int getIndex(int hash) {
+        return hash & (capacity - 1);
+    }
+
+    private int hash(K key) {
+        return (key == null) ? 0 : key.hashCode();
+    }
+
+    private Node<K,V>[] resize() {
+        capacity *= GROW_FACTOR;
+        Node<K,V>[] newTable = (Node<K,V>[]) new Node[capacity];
+        for (Node<K,V> node : table) {
+            Node<K,V> current = node;
+            while (current != null) {
+                Node<K,V> next = current.next;
+                int newIndex = getIndex(current.hash);
+                current.next = newTable[newIndex];
+                newTable[newIndex] = current;
+                current = next;
+            }
+        }
+        table = newTable;
+        threshold = calculateThreshold();
+        return table;
+    }
+
+    private int calculateThreshold() {
+        return (int) (capacity * LOAD_FACTOR);
+    }
+
     private static class Node<K,V> {
         private final int hash;
         private final K key;
         private V value;
         private Node<K,V> next;
 
-        Node(int hash, K key, V value) {
+        private Node(int hash, K key, V value) {
             this.hash = hash;
             this.key = key;
             this.value = value;
