@@ -22,7 +22,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if (size > threshold) {
+        if (size >= threshold) {
             resize();
         }
         int index = getIndex(hash(key));
@@ -46,14 +46,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 }
             }
         }
-    }
-
-    public int getThreshold() {
-        return threshold;
-    }
-
-    public int getLength() {
-        return table.length;
     }
 
     @Override
